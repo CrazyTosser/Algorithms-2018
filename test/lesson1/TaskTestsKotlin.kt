@@ -49,4 +49,16 @@ class TaskTestsKotlin : AbstractTaskTests() {
             assertArrayEquals(expectedResult, second)
         }
     }
+
+    @Test
+    @Tag("Easy")
+    fun testMergeArrays2() {
+        var result = arrayOf(null, null, 1, 2, 3)
+        mergeArrays(arrayOf(4, 5), result)
+        assertArrayEquals(arrayOf(1, 2, 3, 4, 5), result)
+
+        result = arrayOf(null, null, 2, 3, 4)
+        mergeArrays(arrayOf(1, 5), result)
+        assertArrayEquals(arrayOf(1, 2, 3, 4, 5), result)
+    }
 }
