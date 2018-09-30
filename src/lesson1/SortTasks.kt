@@ -2,6 +2,9 @@
 
 package lesson1
 
+import java.io.File
+import java.io.InputStream
+
 /**
  * Сортировка времён
  *
@@ -31,7 +34,17 @@ package lesson1
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortTimes(inputName: String, outputName: String) {
-    TODO()
+    val tm = IntArray(File(inputName).readLines().size)
+    for ((i, str) in File(inputName).readLines().withIndex()) {
+        val tmp = str.split(":")
+        tm[i] = tmp[0].toInt() * 3600 + tmp[1].toInt() * 60 + tmp[2].toInt()
+    }
+    quickSort(tm)
+    File(outputName).printWriter().use { out ->
+        tm.forEach {
+            out.println("%02d:%02d:%02d".format(it / 3600, it % 3600 / 60, it % 3600 % 60))
+        }
+    }
 }
 
 /**
