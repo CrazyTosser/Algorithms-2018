@@ -2,6 +2,7 @@ package lesson1
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Tag
+import java.io.File
 import kotlin.test.Test
 
 class TaskTestsKotlin : AbstractTaskTests() {
@@ -10,6 +11,26 @@ class TaskTestsKotlin : AbstractTaskTests() {
     @Tag("Easy")
     fun testSortTimes() {
         sortTimes { inputName, outputName -> sortTimes(inputName, outputName) }
+    }
+
+    @Test
+    @Tag("Easy")
+    fun testSortTimes2() {
+        try {
+            sortTimes("input/time_in4.txt", "temp.txt")
+            assertFileContent("temp.txt",
+                    """
+                     00:00:00
+                     00:00:01
+                     00:00:02
+                     00:00:03
+                     00:10:00
+                     00:15:00
+                """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
     }
 
     @Test
