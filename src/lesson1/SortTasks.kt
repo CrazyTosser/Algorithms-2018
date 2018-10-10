@@ -73,7 +73,30 @@ fun sortTimes(inputName: String, outputName: String) {
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    TODO()
+    val wr = HashMap<String, HashMap<Int, MutableList<String>>>()
+    val reg = Regex("[А-Яа-я]+ [А-Яа-я]+ - [А-Яа-я]+ \\d+")
+    File(inputName).forEachLine {
+        if (!it.matches(reg)) throw IllegalArgumentException()
+        val tmp = it.split('-').map { item -> item.trim() }
+        val name = tmp[1].split(' ')[0]
+        val num = tmp[1].split(' ')[1].toInt()
+        val fio = tmp[0]
+        if (wr.containsKey(name))
+            if (wr.get(name)!!.containsKey(num))
+                wr.get(name)!!.get(num)!!.add(fio)
+            else
+                wr.get(name)!!.put(num, mutableListOf(fio))
+        else {
+            wr.put(name, HashMap())
+            wr.get(name)!!.put(num, mutableListOf(fio))
+        }
+    }
+    File(outputName).printWriter().use { out ->
+        for (str in wr.toSortedMap()) {
+            for (h in str.value)
+                out.println("%s %d - %s".format(str.key, h.key, h.value.joinToString()))
+        }
+    }
 }
 
 /**

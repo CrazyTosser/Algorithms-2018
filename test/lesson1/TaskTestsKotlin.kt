@@ -1,9 +1,13 @@
 package lesson1
 
+import org.junit.Rule
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Tag
+import org.junit.rules.ExpectedException
 import java.io.File
 import kotlin.test.Test
+import kotlin.test.fail
+
 
 class TaskTestsKotlin : AbstractTaskTests() {
 
@@ -37,6 +41,21 @@ class TaskTestsKotlin : AbstractTaskTests() {
     @Tag("Normal")
     fun testSortAddresses() {
         sortAddresses { inputName, outputName -> sortAddresses(inputName, outputName) }
+    }
+
+    @JvmField
+    @Rule
+    var thrown = ExpectedException.none()
+
+    @Test
+    @Tag("Normal")
+    fun testSortAddresses2() {
+        try {
+            sortAddresses("input/addr_in2.txt", "temp.txt")
+            fail("Excepted IllegalArgumentException")
+        } catch (ex: IllegalArgumentException) {
+
+        }
     }
 
     @Test
