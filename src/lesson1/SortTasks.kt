@@ -34,12 +34,15 @@ import java.util.*
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortTimes(inputName: String, outputName: String) {
-    var tm = mutableListOf<Int>()
+    var tm: Any = mutableListOf<Int>()
+    val reg = Regex("\\d{2}:\\d{2}:\\d{2}")
     for (str in File(inputName).readLines()) {
+        if (!str.matches(reg)) throw IllegalArgumentException()
         val tmp = str.split(":")
-        tm.add(tmp[0].toInt() * 3600 + tmp[1].toInt() * 60 + tmp[2].toInt())
+        (tm as MutableList<Int>).add(tmp[0].toInt() * 3600 + tmp[1].toInt() * 60 + tmp[2].toInt())
     }
-    tm = quickSort(tm.toIntArray()).toMutableList()
+    tm = (tm as MutableList<Int>).toIntArray()
+    heapSort(tm)
     File(outputName).printWriter().use { out ->
         tm.forEach {
             out.println("%02d:%02d:%02d".format(it / 3600, it % 3600 / 60, it % 3600 % 60))
