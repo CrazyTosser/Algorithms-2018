@@ -3,6 +3,7 @@
 package lesson1
 
 import java.io.File
+import java.util.*
 
 /**
  * Сортировка времён
@@ -130,7 +131,103 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    fun endRange(f: Scanner): Boolean {
+        val f1 = f
+        val tmp = f1.next()
+        if (tmp[0] == '\'') f.next()
+        return tmp[0] == '\''
+    }
+
+    var s1: Int
+    var s2: Int
+    var a1: Float
+    var a2 = (0).toFloat()
+    var mark: Int
+    s1 = 1; s2 = 1
+    while (s1 > 0 && s2 > 0) {
+        mark = 1
+        s1 = 0
+        s2 = 0
+        val f = Scanner(File(inputName))
+        val f1 = File("tmp1").writer()
+        val f2 = File("tmp2").writer()
+        a1 = f.nextFloat()
+        if (!f.hasNextFloat()) {
+            f1.write("$a1\n")
+        }
+        if (!f.hasNextFloat()) a2 = f.nextFloat()
+        while (!f.hasNextFloat()) {
+            if (a2 < a1) {
+                when (mark) {
+                    1 -> {
+                        f1.write("' "); mark = 2; s1++
+                    }
+                    2 -> {
+                        f2.write("' "); mark = 1; s2++
+                    }
+                }
+            }
+            if (mark == 1) {
+                f1.write("$a2 "); s1++; } else {
+                f2.write("$a2 "); s2++
+            }
+            a1 = a2
+            a2 = f.nextFloat()
+        }
+        if (s2 > 0 && mark == 2) f2.write("'")
+        if (s1 > 0 && mark == 1) f1.write("'")
+        f2.close()
+        f1.close()
+        f.close()
+        val r = File(inputName).writer()
+        val r1 = Scanner(File("nmsort_1"))
+        val r2 = Scanner(File("nmsort_2"))
+        if (r1.hasNextFloat()) a1 = r1.nextFloat()
+        if (r2.hasNextFloat()) a2 = r2.nextFloat()
+        var file1: Boolean
+        var file2: Boolean
+        while (r1.hasNextFloat() && r2.hasNextFloat()) {
+            file1 = true; file2 = true
+            while (!file1 && !file2) {
+                if (a1 <= a2) {
+                    r.write("$a1 ")
+                    file1 = endRange(r1)
+                    a1 = r1.nextFloat()
+                } else {
+                    r.write("$a2 ")
+                    file2 = endRange(r2)
+                    a2 = r2.nextFloat()
+                }
+            }
+            while (!file1) {
+                r.write("$a1 ")
+                file1 = endRange(r1)
+                a1 = r1.nextFloat()
+            }
+            while (!file2) {
+                r.write("$a2 ")
+                file2 = endRange(r2)
+                a2 = r2.nextFloat()
+            }
+        }
+        file1 = false
+        file2 = false
+        while (!file1 && !r1.hasNextFloat()) {
+            r.write("$a1 ")
+            file1 = endRange(r1)
+            a1 = r1.nextFloat()
+        }
+        while (!file2 && !r2.hasNextFloat()) {
+            r.write("$a2 ")
+            file2 = endRange(r2)
+            a2 = r2.nextFloat()
+        }
+        r.close()
+        r1.close()
+        r2.close()
+    }
+    File("tmp1").delete()
+    File("tmp2").delete()
 }
 
 /**
