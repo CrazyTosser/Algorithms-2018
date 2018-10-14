@@ -3,7 +3,6 @@
 package lesson1
 
 import java.io.File
-import java.io.FileInputStream
 import java.util.*
 
 /**
@@ -138,7 +137,8 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    fun getNum(inp: FileInputStream): Double {
+    TODO()
+    /*fun getNum(inp: FileInputStream): Double {
         val res = StringBuilder()
         var buffer = inp.read().toChar()
         while (buffer == '-' || buffer == '.' || buffer.isDigit()) {
@@ -254,7 +254,7 @@ fun sortTemperatures(inputName: String, outputName: String) {
         r2.close()
     }
     File("tmp1").delete()
-    File("tmp2").delete()
+    File("tmp2").delete()*/
 }
 
 /**
