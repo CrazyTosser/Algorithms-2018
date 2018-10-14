@@ -87,16 +87,10 @@ fun sortAddresses(inputName: String, outputName: String) {
         val num = tmp[1].split(' ')[1].toInt()
         val fio = tmp[0].split(" ")[0]
         val fn = tmp[0].split(" ")[1]
-        if (wr.containsKey(name))
-            if (wr[name]!!.containsKey(num))
-                if (wr[name]!![num]!!.containsKey(fio))
-                    wr[name]!![num]!![fio]!!.add(fn)
-                else
-                    wr[name]!![num]!!.put(fio, sortedSetOf(fn))
-            else
-                wr[name]!!.put(num, hashMapOf(fio to sortedSetOf(fn)).toSortedMap())
-        else
-            wr[name] = hashMapOf(num to hashMapOf(fio to sortedSetOf(fn)).toSortedMap()).toSortedMap()
+        wr.getOrPut(name) { hashMapOf(num to hashMapOf(fio to sortedSetOf(fn)).toSortedMap()).toSortedMap() }
+                .getOrPut(num) { hashMapOf(fio to sortedSetOf(fn)).toSortedMap() }
+                .getOrPut(fio) { sortedSetOf(fn) }
+                .add(fn)
     }
     File(outputName).printWriter().use { out ->
         for (str in wr) {
