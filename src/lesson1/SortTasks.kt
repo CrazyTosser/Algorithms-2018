@@ -3,6 +3,7 @@
 package lesson1
 
 import java.io.File
+import java.io.FileInputStream
 import java.util.*
 
 /**
@@ -137,11 +138,23 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    fun endRange(f: Scanner): Boolean {
-        val f1 = f
-        val tmp = f1.next()
-        if (tmp[0] == '\'') f.next()
-        return tmp[0] == '\''
+    fun getNum(inp: FileInputStream): Double {
+        val res = StringBuilder()
+        var buffer = inp.read().toChar()
+        while (buffer == '-' || buffer == '.' || buffer.isDigit()) {
+            res.append(buffer)
+            buffer = inp.read().toChar()
+        }
+        if (buffer == '\r') inp.read()
+        return if (res.toString().trim() == "") -300.0 else res.toString().trim().toDouble()
+    }
+
+    fun endRange(inp: FileInputStream): Boolean {
+        inp.read()
+        val buf = inp.read().toChar()
+        if (buf == '\uFFFF') return true
+        if (buf != '\'') inp.skip(-2) else inp.skip(1)
+        return buf == '\''
     }
 
     var i = inputName
@@ -155,15 +168,15 @@ fun sortTemperatures(inputName: String, outputName: String) {
         mark = 1
         s1 = 0
         s2 = 0
-        val f = Scanner(File(i))
+        val f = File(i).inputStream()
         val f1 = File("tmp1").writer()
         val f2 = File("tmp2").writer()
-        if (f.hasNextLine()) a1 = f.nextLine().toDouble()
-        if (f.hasNextLine()) {
+        if (f.available() > 0) a1 = getNum(f)
+        if (f.available() > 0) {
             f1.write("$a1\n")
+            a2 = getNum(f)
         }
-        if (f.hasNextLine()) a2 = f.nextLine().toDouble()
-        while (f.hasNextLine()) {
+        while (f.available() > 0) {
             if (a2 < a1) {
                 when (mark) {
                     1 -> {
@@ -174,62 +187,68 @@ fun sortTemperatures(inputName: String, outputName: String) {
                     }
                 }
             }
-            if (mark == 1) {
-                f1.write("$a2 "); s1++; } else {
-                f2.write("$a2 "); s2++
-            }
+            if (a2 > -300.0)
+                if (mark == 1) {
+                    f1.write("$a2\n"); s1++
+                } else {
+                    f2.write("$a2\n"); s2++
+                }
             a1 = a2
-            a2 = f.nextDouble()
+            a2 = getNum(f)
         }
-        if (s2 > 0 && mark == 2) f2.write("'")
-        if (s1 > 0 && mark == 1) f1.write("'")
+        if (s2 > 0 && mark == 2) f2.write("$a2'")
+        if (s1 > 0 && mark == 1) f1.write("$a2'")
         f2.close()
         f1.close()
         f.close()
         i = outputName
         val r = File(i).writer()
-        val r1 = Scanner(File("tmp1"))
-        val r2 = Scanner(File("tmp2"))
-        if (r1.hasNextLine()) a1 = r1.nextLine().toDouble()
-        if (r2.hasNextLine()) a2 = r2.nextLine().toDouble()
+        val r1 = File("tmp1").inputStream()
+        val r2 = File("tmp2").inputStream()
+        a1 = if (r1.available() > 0) getNum(r1) else -300.0
+        a2 = if (r2.available() > 0) getNum(r2) else -300.0
         var file1: Boolean
         var file2: Boolean
-        while (r1.hasNextLine() && r2.hasNextLine()) {
-            file1 = true; file2 = true
+        while (r1.available() > 0 && r2.available() > 0) {
+            file1 = false; file2 = false
             while (!file1 && !file2) {
                 if (a1 <= a2) {
-                    r.write("$a1 ")
+                    r.write("$a1\n")
                     file1 = endRange(r1)
-                    a1 = r1.nextLine().toDouble()
+                    a1 = getNum(r1)
                 } else {
-                    r.write("$a2 ")
+                    r.write("$a2\n")
                     file2 = endRange(r2)
-                    a2 = r2.nextLine().toDouble()
+                    a2 = getNum(r2)
                 }
             }
+            a1 = getNum(r1)
             while (!file1) {
-                r.write("$a1 ")
+                r.write("$a1\n")
                 file1 = endRange(r1)
-                a1 = r1.nextLine().toDouble()
+                a1 = getNum(r1)
             }
+            a2 = getNum(r2)
             while (!file2) {
-                r.write("$a2 ")
+                r.write("$a2\n")
                 file2 = endRange(r2)
-                a2 = r2.nextLine().toDouble()
+                a2 = getNum(r2)
             }
         }
         file1 = false
         file2 = false
-        while (!file1 && r1.hasNextLine()) {
-            r.write("$a1 ")
+        while (!file1 && r1.available() > 0) {
+            r.write("$a1\n")
             file1 = endRange(r1)
-            a1 = r1.nextLine().toDouble()
+            a1 = getNum(r1)
         }
-        while (!file2 && r2.hasNextLine()) {
-            r.write("$a2 ")
+        if (a1.compareTo(-300.0) != 0) r.write("$a1\n")
+        while (!file2 && r2.available() > 0) {
+            r.write("$a2\n")
             file2 = endRange(r2)
-            a2 = r2.nextLine().toDouble()
+            a2 = getNum(r2)
         }
+        if (a2.compareTo(-300.0) != 0) r.write("$a2\n")
         r.close()
         r1.close()
         r2.close()
