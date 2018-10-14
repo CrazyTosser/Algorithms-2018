@@ -77,28 +77,37 @@ fun sortTimes(inputName: String, outputName: String) {
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    val wr = HashMap<String, HashMap<Int, MutableList<String>>>()
+    val wr =
+            HashMap<String, SortedMap<Int, SortedMap<String, TreeSet<String>>>>().toSortedMap()
     val reg = Regex("[А-Яа-я]+ [А-Яа-я]+ - [А-Яа-я]+ \\d+")
     File(inputName).forEachLine {
         if (!it.matches(reg)) throw IllegalArgumentException()
         val tmp = it.split('-').map { item -> item.trim() }
         val name = tmp[1].split(' ')[0]
         val num = tmp[1].split(' ')[1].toInt()
-        val fio = tmp[0]
+        val fio = tmp[0].split(" ")[0]
+        val fn = tmp[0].split(" ")[1]
         if (wr.containsKey(name))
-            if (wr.get(name)!!.containsKey(num))
-                wr.get(name)!!.get(num)!!.add(fio)
+            if (wr[name]!!.containsKey(num))
+                if (wr[name]!![num]!!.containsKey(fio))
+                    wr[name]!![num]!![fio]!!.add(fn)
+                else
+                    wr[name]!![num]!!.put(fio, sortedSetOf(fn))
             else
-                wr.get(name)!!.put(num, mutableListOf(fio))
-        else {
-            wr.put(name, HashMap())
-            wr.get(name)!!.put(num, mutableListOf(fio))
-        }
+                wr[name]!!.put(num, hashMapOf(fio to sortedSetOf(fn)).toSortedMap())
+        else
+            wr[name] = hashMapOf(num to hashMapOf(fio to sortedSetOf(fn)).toSortedMap()).toSortedMap()
     }
     File(outputName).printWriter().use { out ->
-        for (str in wr.toSortedMap()) {
-            for (h in str.value)
-                out.println("%s %d - %s".format(str.key, h.key, h.value.joinToString()))
+        for (str in wr) {
+            for (h in str.value) {
+                val names = StringBuilder()
+                for (hum in h.value)
+                    for (n in hum.value)
+                        names.append(hum.key).append(" ").append(n).append(", ")
+                out.println("%s %d - %s".format(str.key, h.key,
+                        names.toString().substring(0, names.toString().length - 2)))
+            }
         }
     }
 }
@@ -141,32 +150,33 @@ fun sortTemperatures(inputName: String, outputName: String) {
         return tmp[0] == '\''
     }
 
+    var i = inputName
     var s1: Int
     var s2: Int
-    var a1: Float
-    var a2 = (0).toFloat()
+    var a1 = 0.0
+    var a2 = 0.0
     var mark: Int
     s1 = 1; s2 = 1
     while (s1 > 0 && s2 > 0) {
         mark = 1
         s1 = 0
         s2 = 0
-        val f = Scanner(File(inputName))
+        val f = Scanner(File(i))
         val f1 = File("tmp1").writer()
         val f2 = File("tmp2").writer()
-        a1 = f.nextFloat()
-        if (!f.hasNextFloat()) {
+        if (f.hasNextLine()) a1 = f.nextLine().toDouble()
+        if (f.hasNextLine()) {
             f1.write("$a1\n")
         }
-        if (!f.hasNextFloat()) a2 = f.nextFloat()
-        while (!f.hasNextFloat()) {
+        if (f.hasNextLine()) a2 = f.nextLine().toDouble()
+        while (f.hasNextLine()) {
             if (a2 < a1) {
                 when (mark) {
                     1 -> {
-                        f1.write("' "); mark = 2; s1++
+                        f1.write("'\n"); mark = 2; s1++
                     }
                     2 -> {
-                        f2.write("' "); mark = 1; s2++
+                        f2.write("'\n"); mark = 1; s2++
                     }
                 }
             }
@@ -175,55 +185,56 @@ fun sortTemperatures(inputName: String, outputName: String) {
                 f2.write("$a2 "); s2++
             }
             a1 = a2
-            a2 = f.nextFloat()
+            a2 = f.nextDouble()
         }
         if (s2 > 0 && mark == 2) f2.write("'")
         if (s1 > 0 && mark == 1) f1.write("'")
         f2.close()
         f1.close()
         f.close()
-        val r = File(inputName).writer()
-        val r1 = Scanner(File("nmsort_1"))
-        val r2 = Scanner(File("nmsort_2"))
-        if (r1.hasNextFloat()) a1 = r1.nextFloat()
-        if (r2.hasNextFloat()) a2 = r2.nextFloat()
+        i = outputName
+        val r = File(i).writer()
+        val r1 = Scanner(File("tmp1"))
+        val r2 = Scanner(File("tmp2"))
+        if (r1.hasNextLine()) a1 = r1.nextLine().toDouble()
+        if (r2.hasNextLine()) a2 = r2.nextLine().toDouble()
         var file1: Boolean
         var file2: Boolean
-        while (r1.hasNextFloat() && r2.hasNextFloat()) {
+        while (r1.hasNextLine() && r2.hasNextLine()) {
             file1 = true; file2 = true
             while (!file1 && !file2) {
                 if (a1 <= a2) {
                     r.write("$a1 ")
                     file1 = endRange(r1)
-                    a1 = r1.nextFloat()
+                    a1 = r1.nextLine().toDouble()
                 } else {
                     r.write("$a2 ")
                     file2 = endRange(r2)
-                    a2 = r2.nextFloat()
+                    a2 = r2.nextLine().toDouble()
                 }
             }
             while (!file1) {
                 r.write("$a1 ")
                 file1 = endRange(r1)
-                a1 = r1.nextFloat()
+                a1 = r1.nextLine().toDouble()
             }
             while (!file2) {
                 r.write("$a2 ")
                 file2 = endRange(r2)
-                a2 = r2.nextFloat()
+                a2 = r2.nextLine().toDouble()
             }
         }
         file1 = false
         file2 = false
-        while (!file1 && !r1.hasNextFloat()) {
+        while (!file1 && r1.hasNextLine()) {
             r.write("$a1 ")
             file1 = endRange(r1)
-            a1 = r1.nextFloat()
+            a1 = r1.nextLine().toDouble()
         }
-        while (!file2 && !r2.hasNextFloat()) {
+        while (!file2 && r2.hasNextLine()) {
             r.write("$a2 ")
             file2 = endRange(r2)
-            a2 = r2.nextFloat()
+            a2 = r2.nextLine().toDouble()
         }
         r.close()
         r1.close()
