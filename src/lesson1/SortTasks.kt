@@ -149,8 +149,8 @@ fun sortTemperatures(inputName: String, outputName: String) {
         s2 = 0
         val f = Scanner(File(i))
         //f.useDelimiter("\n|(\r\n)") - ne srabativaet
-        val f1 = File("tmp1").writer()
-        val f2 = File("tmp2").writer()
+        val f1 = File("tmp1").bufferedWriter()
+        val f2 = File("tmp2").bufferedWriter()
         a1 = f.nextLine().toDouble()
         if (f.hasNextLine()) {
             f1.write("$a1\n")
@@ -182,7 +182,7 @@ fun sortTemperatures(inputName: String, outputName: String) {
         f.close()
         i = outputName
         if (s1 == 0 && s2 == 0) break
-        val r = File(i).writer()
+        val r = File(i).bufferedWriter()
         val r1 = Scanner(File("tmp1"))
         val r2 = Scanner(File("tmp2"))
         r1.useDelimiter("\n"); r2.useDelimiter("\n")
