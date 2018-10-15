@@ -136,126 +136,25 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    var i = inputName
-    var s1: Int
-    var s2: Int
-    var a1: Double
-    var a2 = 0.0
-    var mark: Int
-    s1 = 1; s2 = 1
-    while (s1 > 0 && s2 > 0) {
-        mark = 1
-        s1 = 0
-        s2 = 0
-        val f = Scanner(File(i))
-        //f.useDelimiter("\n|(\r\n)") - ne srabativaet
-        val f1 = File("tmp1").writer()
-        val f2 = File("tmp2").writer()
-        a1 = f.nextLine().toDouble()
-        if (f.hasNextLine()) {
-            f1.write("$a1\n")
-            a2 = f.nextLine().toDouble()
-        }
-        while (f.hasNextLine()) {
-            if (a2 < a1) {
-                when (mark) {
-                    1 -> {
-                        f1.write("'\n"); mark = 2; s1++
-                    }
-                    2 -> {
-                        f2.write("'\n"); mark = 1; s2++
-                    }
-                }
-            }
-            if (mark == 1) {
-                f1.write("$a2\n"); s1++
-            } else {
-                f2.write("$a2\n"); s2++
-            }
-            a1 = a2
-            a2 = f.nextLine().toDouble()
-        }
-        if (s2 > 0 && mark == 2) f2.write("$a2\n'\n")
-        if (s1 > 0 && mark == 1) f1.write("$a2\n'\n")
-        f2.close()
-        f1.close()
-        f.close()
-        i = outputName
-        if (s1 == 0 && s2 == 0) break
-        val r = File(i).writer()
-        val r1 = Scanner(File("tmp1"))
-        val r2 = Scanner(File("tmp2"))
-        r1.useDelimiter("\n"); r2.useDelimiter("\n")
-        if (r1.hasNextLine()) a1 = r1.nextLine().toDouble()
-        if (r2.hasNextLine()) a2 = r2.nextLine().toDouble()
-        var file1: Boolean
-        var file2: Boolean
-        while (r1.hasNextLine() && r2.hasNextLine()) {
-            file1 = false; file2 = false
-            while (!file1 && !file2) {
-                if (a1 <= a2) {
-                    r.write("$a1\n")
-                    val tmp = r1.nextLine()
-                    if (tmp == "'") {
-                        file1 = true
-                        if (r1.hasNextLine()) a1 = r1.nextLine().toDouble()
-                    } else
-                        a1 = tmp.toDouble()
-                } else {
-                    r.write("$a2\n")
-                    val tmp = r2.nextLine()
-                    if (tmp == "'") {
-                        file2 = true
-                        if (r2.hasNextLine()) a2 = r2.nextLine().toDouble()
-                    } else
-                        a2 = tmp.toDouble()
-                }
-            }
-            while (!file1) {
-                r.write("$a1\n")
-                val tmp = r1.nextLine()
-                if (tmp == "'") {
-                    file1 = true
-                    if (r1.hasNextLine()) a1 = r1.nextLine().toDouble()
-                } else
-                    a1 = tmp.toDouble()
-            }
-            while (!file2) {
-                r.write("$a2\n")
-                val tmp = r2.nextLine()
-                if (tmp == "'") {
-                    file2 = true
-                    if (r2.hasNextLine()) a2 = r2.nextLine().toDouble()
-                } else
-                    a2 = tmp.toDouble()
-            }
-        }
-        file1 = false
-        file2 = false
-        while (!file1 && r1.hasNextLine()) {
-            r.write("$a1\n")
-            val tmp = r1.nextLine()
-            if (tmp == "'") {
-                file1 = true
-                if (r1.hasNextLine()) a1 = r1.nextLine().toDouble()
-            } else
-                a1 = tmp.toDouble()
-        }
-        while (!file2 && r2.hasNextLine()) {
-            r.write("$a2\n")
-            val tmp = r2.nextLine()
-            if (tmp == "'") {
-                file2 = true
-                if (r2.hasNextLine()) a2 = r2.nextLine().toDouble()
-            } else
-                a2 = tmp.toDouble()
-        }
-        r.close()
-        r1.close()
-        r2.close()
+    val wr = listOf<Short>()
+    val min = -2730
+    val max = 5000
+    val size = max - min + 1
+    val ind = IntArray(size)
+    val fin = Scanner(File(inputName))
+    while (fin.hasNextLine()) {
+        ind[(fin.nextLine().toDouble() * 10).toInt() - min]++
     }
-    File("tmp1").delete()
-    File("tmp2").delete()
+    File(outputName).printWriter().use {
+        for (i in 0 until size) {
+            var count = ind[i]
+            while (count > 0) {
+                it.println((i + min).toDouble() / 10)
+                count--
+            }
+        }
+    }
+    return print(wr)
 }
 
 /**
