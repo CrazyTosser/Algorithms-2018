@@ -77,8 +77,7 @@ fun sortTimes(inputName: String, outputName: String) {
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    val wr =
-            HashMap<String, SortedMap<Int, SortedMap<String, TreeSet<String>>>>().toSortedMap()
+    val wr = sortedMapOf<String, SortedMap<Int, SortedMap<String, TreeSet<String>>>>()
     val reg = Regex("[А-Яа-я]+ [А-Яа-я]+ - [А-Яа-я]+ \\d+")
     File(inputName).forEachLine {
         if (!it.matches(reg)) throw IllegalArgumentException()
@@ -87,8 +86,8 @@ fun sortAddresses(inputName: String, outputName: String) {
         val num = tmp[1].split(' ')[1].toInt()
         val fio = tmp[0].split(" ")[0]
         val fn = tmp[0].split(" ")[1]
-        wr.getOrPut(name) { hashMapOf(num to hashMapOf(fio to sortedSetOf(fn)).toSortedMap()).toSortedMap() }
-                .getOrPut(num) { hashMapOf(fio to sortedSetOf(fn)).toSortedMap() }
+        wr.getOrPut(name) { sortedMapOf(num to sortedMapOf(fio to sortedSetOf(fn))) }
+                .getOrPut(num) { sortedMapOf(fio to sortedSetOf(fn)).toSortedMap() }
                 .getOrPut(fio) { sortedSetOf(fn) }
                 .add(fn)
     }
@@ -137,30 +136,10 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
-    /*fun getNum(inp: FileInputStream): Double {
-        val res = StringBuilder()
-        var buffer = inp.read().toChar()
-        while (buffer == '-' || buffer == '.' || buffer.isDigit()) {
-            res.append(buffer)
-            buffer = inp.read().toChar()
-        }
-        if (buffer == '\r') inp.read()
-        return if (res.toString().trim() == "") -300.0 else res.toString().trim().toDouble()
-    }
-
-    fun endRange(inp: FileInputStream): Boolean {
-        inp.read()
-        val buf = inp.read().toChar()
-        if (buf == '\uFFFF') return true
-        if (buf != '\'') inp.skip(-2) else inp.skip(1)
-        return buf == '\''
-    }
-
     var i = inputName
     var s1: Int
     var s2: Int
-    var a1 = 0.0
+    var a1: Double
     var a2 = 0.0
     var mark: Int
     s1 = 1; s2 = 1
@@ -168,15 +147,16 @@ fun sortTemperatures(inputName: String, outputName: String) {
         mark = 1
         s1 = 0
         s2 = 0
-        val f = File(i).inputStream()
+        val f = Scanner(File(i))
+        //f.useDelimiter("\n|(\r\n)") - ne srabativaet
         val f1 = File("tmp1").writer()
         val f2 = File("tmp2").writer()
-        if (f.available() > 0) a1 = getNum(f)
-        if (f.available() > 0) {
+        a1 = f.nextLine().toDouble()
+        if (f.hasNextLine()) {
             f1.write("$a1\n")
-            a2 = getNum(f)
+            a2 = f.nextLine().toDouble()
         }
-        while (f.available() > 0) {
+        while (f.hasNextLine()) {
             if (a2 < a1) {
                 when (mark) {
                     1 -> {
@@ -187,74 +167,95 @@ fun sortTemperatures(inputName: String, outputName: String) {
                     }
                 }
             }
-            if (a2 > -300.0)
-                if (mark == 1) {
-                    f1.write("$a2\n"); s1++
-                } else {
-                    f2.write("$a2\n"); s2++
-                }
+            if (mark == 1) {
+                f1.write("$a2\n"); s1++
+            } else {
+                f2.write("$a2\n"); s2++
+            }
             a1 = a2
-            a2 = getNum(f)
+            a2 = f.nextLine().toDouble()
         }
-        if (s2 > 0 && mark == 2) f2.write("$a2'")
-        if (s1 > 0 && mark == 1) f1.write("$a2'")
+        if (s2 > 0 && mark == 2) f2.write("$a2\n'\n")
+        if (s1 > 0 && mark == 1) f1.write("$a2\n'\n")
         f2.close()
         f1.close()
         f.close()
         i = outputName
+        if (s1 == 0 && s2 == 0) break
         val r = File(i).writer()
-        val r1 = File("tmp1").inputStream()
-        val r2 = File("tmp2").inputStream()
-        a1 = if (r1.available() > 0) getNum(r1) else -300.0
-        a2 = if (r2.available() > 0) getNum(r2) else -300.0
+        val r1 = Scanner(File("tmp1"))
+        val r2 = Scanner(File("tmp2"))
+        r1.useDelimiter("\n"); r2.useDelimiter("\n")
+        if (r1.hasNextLine()) a1 = r1.nextLine().toDouble()
+        if (r2.hasNextLine()) a2 = r2.nextLine().toDouble()
         var file1: Boolean
         var file2: Boolean
-        while (r1.available() > 0 && r2.available() > 0) {
+        while (r1.hasNextLine() && r2.hasNextLine()) {
             file1 = false; file2 = false
             while (!file1 && !file2) {
                 if (a1 <= a2) {
                     r.write("$a1\n")
-                    file1 = endRange(r1)
-                    a1 = getNum(r1)
+                    val tmp = r1.nextLine()
+                    if (tmp == "'") {
+                        file1 = true
+                        if (r1.hasNextLine()) a1 = r1.nextLine().toDouble()
+                    } else
+                        a1 = tmp.toDouble()
                 } else {
                     r.write("$a2\n")
-                    file2 = endRange(r2)
-                    a2 = getNum(r2)
+                    val tmp = r2.nextLine()
+                    if (tmp == "'") {
+                        file2 = true
+                        if (r2.hasNextLine()) a2 = r2.nextLine().toDouble()
+                    } else
+                        a2 = tmp.toDouble()
                 }
             }
-            a1 = getNum(r1)
             while (!file1) {
                 r.write("$a1\n")
-                file1 = endRange(r1)
-                a1 = getNum(r1)
+                val tmp = r1.nextLine()
+                if (tmp == "'") {
+                    file1 = true
+                    if (r1.hasNextLine()) a1 = r1.nextLine().toDouble()
+                } else
+                    a1 = tmp.toDouble()
             }
-            a2 = getNum(r2)
             while (!file2) {
                 r.write("$a2\n")
-                file2 = endRange(r2)
-                a2 = getNum(r2)
+                val tmp = r2.nextLine()
+                if (tmp == "'") {
+                    file2 = true
+                    if (r2.hasNextLine()) a2 = r2.nextLine().toDouble()
+                } else
+                    a2 = tmp.toDouble()
             }
         }
         file1 = false
         file2 = false
-        while (!file1 && r1.available() > 0) {
+        while (!file1 && r1.hasNextLine()) {
             r.write("$a1\n")
-            file1 = endRange(r1)
-            a1 = getNum(r1)
+            val tmp = r1.nextLine()
+            if (tmp == "'") {
+                file1 = true
+                if (r1.hasNextLine()) a1 = r1.nextLine().toDouble()
+            } else
+                a1 = tmp.toDouble()
         }
-        if (a1.compareTo(-300.0) != 0) r.write("$a1\n")
-        while (!file2 && r2.available() > 0) {
+        while (!file2 && r2.hasNextLine()) {
             r.write("$a2\n")
-            file2 = endRange(r2)
-            a2 = getNum(r2)
+            val tmp = r2.nextLine()
+            if (tmp == "'") {
+                file2 = true
+                if (r2.hasNextLine()) a2 = r2.nextLine().toDouble()
+            } else
+                a2 = tmp.toDouble()
         }
-        if (a2.compareTo(-300.0) != 0) r.write("$a2\n")
         r.close()
         r1.close()
         r2.close()
     }
     File("tmp1").delete()
-    File("tmp2").delete()*/
+    File("tmp2").delete()
 }
 
 /**
