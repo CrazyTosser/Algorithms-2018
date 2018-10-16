@@ -34,18 +34,29 @@ import java.util.*
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortTimes(inputName: String, outputName: String) {
-    var tm: Any = mutableListOf<Int>()
+    var tm = mutableListOf<String>()
     val reg = Regex("\\d{2}:\\d{2}:\\d{2}")
     for (str in File(inputName).readLines()) {
         if (!str.matches(reg)) throw IllegalArgumentException()
-        val tmp = str.split(":")
-        (tm as MutableList<Int>).add(tmp[0].toInt() * 3600 + tmp[1].toInt() * 60 + tmp[2].toInt())
+        tm.add(str)
     }
-    tm = (tm as MutableList<Int>).toIntArray()
-    heapSort(tm)
+    val N = tm.size
+    val W = tm[0].length
+    for (d in W - 1 downTo 0) {
+        val count = IntArray(256)
+        val temp = MutableList(tm.size, { "" })
+        for (i in 0 until N)
+            count[(tm[i][d] + 1).toInt()]++
+        for (k in 1..255)
+            count[k] += count[k - 1]
+        for (i in 0 until N)
+            temp[count[tm[i][d].toInt()]++] = tm[i]
+        for (i in 0 until N)
+            tm[i] = temp[i]
+    }
     File(outputName).printWriter().use { out ->
         tm.forEach {
-            out.println("%02d:%02d:%02d".format(it / 3600, it % 3600 / 60, it % 3600 % 60))
+            out.println(it)
         }
     }
 }

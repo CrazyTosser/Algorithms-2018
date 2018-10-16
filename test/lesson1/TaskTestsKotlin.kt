@@ -3,6 +3,7 @@ package lesson1
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Tag
 import java.io.File
+import java.util.*
 import kotlin.test.Test
 import kotlin.test.fail
 
@@ -56,6 +57,27 @@ class TaskTestsKotlin : AbstractTaskTests() {
     @Tag("Normal")
     fun testSortTemperatures() {
         sortTemperatures { inputName, outputName -> sortTemperatures(inputName, outputName) }
+    }
+
+    @Test
+    @Tag("Normal")
+    fun testSortTemperatures2() {
+        val random = Random()
+        File("temp_unsorted.txt").bufferedWriter().use { out ->
+            for (i in 1..100000) {
+                out.write("${random.nextInt(7730).toDouble() / 10 - 273.0}\n")
+            }
+        }
+        sortTemperatures("temp_unsorted.txt", "tmp")
+        Scanner(File("tmp")).use {
+            var s1 = it.nextLine().toDouble()
+            var s2 = it.nextLine().toDouble()
+            while (it.hasNextLine()) {
+                if (s1 > s2) fail("$s1 ? $s2")
+                s1 = s2
+                s2 = it.nextLine().toDouble()
+            }
+        }
     }
 
     @Test
