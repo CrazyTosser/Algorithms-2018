@@ -2,6 +2,7 @@
 
 package lesson2
 
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -106,7 +107,19 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Единица простым числом не считается.
  */
 fun calcPrimesNumber(limit: Int): Int {
-    TODO()
+    if (limit < 2) return 0
+    if (limit == 2) return 1
+    val a = BooleanArray(limit)
+    a.fill(true, 2)
+    for (i in 2 until limit)
+        if (a[i]) {
+            var j = 2
+            while (j * i in 1 until limit) {
+                a[i * j] = false
+                j++
+            }
+        }
+    return a.count { it }
 }
 
 /**
