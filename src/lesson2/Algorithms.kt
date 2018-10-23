@@ -2,6 +2,8 @@
 
 package lesson2
 
+import java.io.File
+
 
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
@@ -93,7 +95,28 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * вернуть ту из них, которая встречается раньше в строке first.
  */
 fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+    if (first.isEmpty() || second.isEmpty()) return ""
+    if (first == second) return first
+    val matrix = arrayOfNulls<IntArray>(first.length)
+    var maxLength = 0
+    var maxI = 0
+    for (i in 0 until matrix.size) {
+        matrix[i] = IntArray(second.length)
+        for (j in 0 until matrix[i]!!.size) {
+            if (first[i] == second[j]) {
+                if (i != 0 && j != 0) {
+                    matrix[i]!![j] = matrix[i - 1]!![j - 1] + 1
+                } else {
+                    matrix[i]!![j] = 1
+                }
+                if (matrix[i]!![j] > maxLength) {
+                    maxLength = matrix[i]!![j]
+                    maxI = i
+                }
+            }
+        }
+    }
+    return first.substring(maxI - maxLength + 1, maxI + 1)
 }
 
 /**
@@ -149,5 +172,36 @@ fun calcPrimesNumber(limit: Int): Int {
  * Остальные символы ни в файле, ни в словах не допускаются.
  */
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
-    TODO()
+    val deck = mutableListOf<List<Char>>()
+    val move = listOf(Pair(1, 0), Pair(0, 1), Pair(0, -1), Pair(-1, 0))
+
+    fun find(pos: Pair<Int, Int>, c: Char, string: String): Boolean {
+        for (it in move) {
+            val x = it.first + pos.first
+            val y = it.second + pos.second
+            if ((x >= 0) && (x < deck[pos.second].size) && (y >= 0) && (y < deck.size))
+                if (deck[y][x] == c) {
+                    if (string.isEmpty()) return true
+                    val res = find(Pair(x, y), string[0], string.substring(1))
+                    if (res) return res
+                }
+        }
+        return false
+    }
+    File(inputName).readLines().forEach { line ->
+        deck.add(line.split(" ").map { it[0] })
+    }
+    val tmp = words.toMutableSet()
+    val res = mutableSetOf<String>()
+    for (y in 0 until deck.size) {
+        for (x in 0 until deck[y].size) {
+            for (w in tmp) {
+                if (deck[y][x] == w[0] && find(Pair(x, y), w[1], w.substring(2)))
+                    res.add(w)
+            }
+            tmp.removeAll(res)
+            if (tmp.size == 0) return res
+        }
+    }
+    return res
 }

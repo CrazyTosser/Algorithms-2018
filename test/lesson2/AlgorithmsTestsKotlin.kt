@@ -2,6 +2,7 @@ package lesson2
 
 import org.junit.jupiter.api.Tag
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class AlgorithmsTestsKotlin : AbstractAlgorithmsTests() {
     @Test
@@ -26,6 +27,13 @@ class AlgorithmsTestsKotlin : AbstractAlgorithmsTests() {
     @Tag("Easy")
     fun testCalcPrimesNumber() {
         calcPrimesNumber { calcPrimesNumber(it) }
+    }
+
+    @Test
+    @Tag("Easy")
+    fun testCalcPrimesNumber2() {
+        assertEquals(788060, calcPrimesNumber(12000000))
+        assertEquals(910077, calcPrimesNumber(14000000))
     }
 
     @Test
