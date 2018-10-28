@@ -32,9 +32,10 @@ import java.util.*
  * 19:56:14
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
+ * Сложность O(Wn), ресурсоемкость R(n+R) (Так как строка у нас по жизни 8 символов, то O(n)
  */
 fun sortTimes(inputName: String, outputName: String) {
-    var tm = mutableListOf<String>()
+    val tm = mutableListOf<String>()
     val reg = Regex("\\d{2}:\\d{2}:\\d{2}")
     for (str in File(inputName).readLines()) {
         if (!str.matches(reg)) throw IllegalArgumentException()
@@ -44,7 +45,7 @@ fun sortTimes(inputName: String, outputName: String) {
     val W = tm[0].length
     for (d in W - 1 downTo 0) {
         val count = IntArray(256)
-        val temp = MutableList(tm.size, { "" })
+        val temp = MutableList(tm.size) { "" }
         for (i in 0 until N)
             count[(tm[i][d] + 1).toInt()]++
         for (k in 1..255)
@@ -86,6 +87,7 @@ fun sortTimes(inputName: String, outputName: String) {
  * Садовая 5 - Сидоров Петр, Сидорова Мария
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
+ * Сложность - O(n), ресурсоемкость R(n)
  */
 fun sortAddresses(inputName: String, outputName: String) {
     val wr = sortedMapOf<String, SortedMap<Int, SortedMap<String, TreeSet<String>>>>()
@@ -98,7 +100,7 @@ fun sortAddresses(inputName: String, outputName: String) {
         val fio = tmp[0].split(" ")[0]
         val fn = tmp[0].split(" ")[1]
         wr.getOrPut(name) { sortedMapOf(num to sortedMapOf(fio to sortedSetOf(fn))) }
-                .getOrPut(num) { sortedMapOf(fio to sortedSetOf(fn)).toSortedMap() }
+                .getOrPut(num) { sortedMapOf(fio to sortedSetOf(fn)) }
                 .getOrPut(fio) { sortedSetOf(fn) }
                 .add(fn)
     }
@@ -145,6 +147,7 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 24.7
  * 99.5
  * 121.3
+ * сложность - O(n+k), ресурчоемкость - R(k) (в данном случае k=7730)
  */
 fun sortTemperatures(inputName: String, outputName: String) {
     val wr = listOf<Short>()
@@ -214,6 +217,7 @@ fun sortSequence(inputName: String, outputName: String) {
  * second = [null null null null null 1 3 9 13 18 23]
  *
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
+ * Сложность. В лучшем случае O(k), в среднем O(n), в худшем (k+n)
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
     var i = first.size
