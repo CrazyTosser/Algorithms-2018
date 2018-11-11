@@ -34,7 +34,7 @@ import java.util.*
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortTimes(inputName: String, outputName: String) {
-    var tm = mutableListOf<String>()
+    val tm = mutableListOf<String>()
     val reg = Regex("\\d{2}:\\d{2}:\\d{2}")
     for (str in File(inputName).readLines()) {
         if (!str.matches(reg)) throw IllegalArgumentException()
@@ -44,7 +44,7 @@ fun sortTimes(inputName: String, outputName: String) {
     val W = tm[0].length
     for (d in W - 1 downTo 0) {
         val count = IntArray(256)
-        val temp = MutableList(tm.size, { "" })
+        val temp = MutableList(tm.size) { "" }
         for (i in 0 until N)
             count[(tm[i][d] + 1).toInt()]++
         for (k in 1..255)

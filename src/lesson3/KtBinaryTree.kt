@@ -3,6 +3,7 @@ package lesson3
 import java.util.SortedSet
 import kotlin.NoSuchElementException
 
+
 // Attention: comparable supported but comparator is not
 class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSortedSet<T> {
 
@@ -11,7 +12,7 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
     override var size = 0
         private set
 
-    private class Node<T>(val value: T) {
+    private class Node<T>(var value: T) {
 
         var left: Node<T>? = null
 
@@ -55,7 +56,31 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Средняя
      */
     override fun remove(element: T): Boolean {
-        TODO()
+        var target = find(element)
+        if (target == root)
+            root = null
+        else
+            target = remove(target)
+        return contains(element)
+    }
+
+    private fun remove(target: Node<T>?): Node<T>? {
+        if (target!!.left != null && target.right != null) {
+            val lMax = findMax(target.left)
+            target.value = lMax.value
+            remove(lMax)
+        } else if (target.left != null)
+            return target.left
+        else if (target.right != null)
+            return target.right
+        return null
+    }
+
+    private fun findMax(node: KtBinaryTree.Node<T>?): Node<T> {
+        var res = node
+        while (res!!.right != null)
+            res = res.right
+        return res
     }
 
     override operator fun contains(element: T): Boolean {
