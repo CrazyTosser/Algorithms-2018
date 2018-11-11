@@ -93,6 +93,7 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * При сравнении подстрок, регистр символов *имеет* значение.
  * Если имеется несколько самых длинных общих подстрок одной длины,
  * вернуть ту из них, которая встречается раньше в строке first.
+ * сложность O(mn), ресурсоемкость R(mn)
  */
 fun longestCommonSubstring(first: String, second: String): String {
     if (first.isEmpty() || second.isEmpty()) return ""
@@ -128,6 +129,7 @@ fun longestCommonSubstring(first: String, second: String): String {
  *
  * Справка: простым считается число, которое делится нацело только на 1 и на себя.
  * Единица простым числом не считается.
+ * Сложность O(ln(ln(n))), ресурсоемкость R(n)
  */
 fun calcPrimesNumber(limit: Int): Int {
     if (limit < 2) return 0
@@ -170,6 +172,7 @@ fun calcPrimesNumber(limit: Int): Int {
  * Все слова и буквы -- русские или английские, прописные.
  * В файле буквы разделены пробелами, строки -- переносами строк.
  * Остальные символы ни в файле, ни в словах не допускаются.
+ * Сложность O(n^2), ресурсы R(mh) (m и h - размеры поля)
  */
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
     val deck = mutableListOf<List<Char>>()

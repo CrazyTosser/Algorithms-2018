@@ -32,6 +32,7 @@ import java.util.*
  * 19:56:14
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
+ * Сложность O(Wn), ресурсоемкость R(n+R) (Так как строка у нас по жизни 8 символов, то O(n)
  */
 fun sortTimes(inputName: String, outputName: String) {
     val tm = mutableListOf<String>()
@@ -86,6 +87,7 @@ fun sortTimes(inputName: String, outputName: String) {
  * Садовая 5 - Сидоров Петр, Сидорова Мария
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
+ * Сложность - O(n), ресурсоемкость R(n)
  */
 fun sortAddresses(inputName: String, outputName: String) {
     val wr = sortedMapOf<String, SortedMap<Int, SortedMap<String, TreeSet<String>>>>()
@@ -98,7 +100,7 @@ fun sortAddresses(inputName: String, outputName: String) {
         val fio = tmp[0].split(" ")[0]
         val fn = tmp[0].split(" ")[1]
         wr.getOrPut(name) { sortedMapOf(num to sortedMapOf(fio to sortedSetOf(fn))) }
-                .getOrPut(num) { sortedMapOf(fio to sortedSetOf(fn)).toSortedMap() }
+                .getOrPut(num) { sortedMapOf(fio to sortedSetOf(fn)) }
                 .getOrPut(fio) { sortedSetOf(fn) }
                 .add(fn)
     }
@@ -145,6 +147,7 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 24.7
  * 99.5
  * 121.3
+ * сложность - O(n+k), ресурчоемкость - R(k) (в данном случае k=7730)
  */
 fun sortTemperatures(inputName: String, outputName: String) {
     val wr = listOf<Short>()
@@ -214,6 +217,7 @@ fun sortSequence(inputName: String, outputName: String) {
  * second = [null null null null null 1 3 9 13 18 23]
  *
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
+ * Сложность. В лучшем случае O(k), в среднем O(n), в худшем (k+n)
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
     var i = first.size
