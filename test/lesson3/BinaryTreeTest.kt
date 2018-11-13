@@ -1,8 +1,8 @@
 package lesson3
 
 import org.junit.jupiter.api.Tag
-import kotlin.test.Test
 import java.util.*
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -66,8 +66,8 @@ class BinaryTreeTest {
             treeSet.remove(toRemove)
             binarySet.remove(toRemove)
             println("Removing $toRemove from $list")
-            assertEquals<SortedSet<*>>(treeSet, binarySet, "After removal of $toRemove from $list")
             assertEquals(treeSet.size, binarySet.size)
+            assertEquals<SortedSet<*>>(treeSet, binarySet, "After removal of $toRemove from $list")
             for (element in list) {
                 val inn = element != toRemove
                 assertEquals(inn, element in binarySet,

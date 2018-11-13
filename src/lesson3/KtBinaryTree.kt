@@ -13,10 +13,10 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         private set
 
     private class Node<T>(var value: T) {
-
         var left: Node<T>? = null
-
         var right: Node<T>? = null
+        var uplink: Node<T>? = null
+        var parent: Node<T>? = null
     }
 
     override fun add(element: T): Boolean {
@@ -30,11 +30,16 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
             closest == null -> root = newNode
             comparison < 0 -> {
                 assert(closest.left == null)
+                newNode.uplink = closest
+                newNode.parent = closest
                 closest.left = newNode
             }
             else -> {
                 assert(closest.right == null)
+                newNode.uplink = closest.uplink
+                newNode.parent = closest
                 closest.right = newNode
+                closest.uplink = null
             }
         }
         size++
@@ -56,24 +61,36 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Средняя
      */
     override fun remove(element: T): Boolean {
-        var target = find(element)
-        if (target == root)
-            root = null
-        else
-            target = remove(target)
+        if (!contains(element) || root == null) return false
+        val del = find(element)
+        remove(del)
         return contains(element)
     }
 
-    private fun remove(target: Node<T>?): Node<T>? {
-        if (target!!.left != null && target.right != null) {
-            val lMax = findMax(target.left)
-            target.value = lMax.value
-            remove(lMax)
-        } else if (target.left != null)
-            return target.left
-        else if (target.right != null)
-            return target.right
-        return null
+    private fun remove(del: Node<T>?) {
+        if (del?.left == null && del?.right == null) {
+            if (del?.parent?.left == del)
+                del?.parent?.left = null
+            else {
+                del?.parent?.uplink = del?.uplink
+                del?.parent?.right = null
+            }
+        } else if (del.right != null) {
+            if (del.parent?.left == del)
+                del.parent?.left = del.right
+            else
+                del.parent?.right = del.right
+        } else if (del.left != null) {
+            del.left?.uplink = del.parent
+            if (del.parent?.left == del)
+                del.parent?.left = del.left
+            else
+                del.parent?.right = del.right
+        } else {
+            val f = min(del.right!!)
+            del.value = f.value
+            remove(f)
+        }
     }
 
     private fun findMax(node: KtBinaryTree.Node<T>?): Node<T> {
@@ -100,23 +117,37 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         }
     }
 
-    inner class BinaryTreeIterator : MutableIterator<T> {
+    inner class BinaryTreeIterator
+    /**
+     * Поиск следующего элемента
+     * Средняя
+     */
+        : MutableIterator<T> {
 
-        private var current: Node<T>? = null
+        private var next: Node<T>? = null
+        private var last: Node<T>? = null
 
-        /**
-         * Поиск следующего элемента
-         * Средняя
-         */
-        private fun findNext(): Node<T>? {
-            TODO()
+        init {
+            this.next = root?.let { min(it) } ?: throw NoSuchElementException()
         }
 
-        override fun hasNext(): Boolean = findNext() != null
+        private fun findNext(): Node<T>? {
+            last = next
+            next = if (next?.right != null) {
+                min(next?.right!!)
+            } else {
+                if (next?.uplink != null) {
+                    next?.uplink
+                } else
+                    null
+            }
+            return last
+        }
+
+        override fun hasNext(): Boolean = next != null
 
         override fun next(): T {
-            current = findNext()
-            return (current ?: throw NoSuchElementException()).value
+            return (findNext() ?: throw NoSuchElementException()).value
         }
 
         /**
@@ -124,7 +155,9 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Сложная
          */
         override fun remove() {
-            TODO()
+            if (last != null)
+                remove(last)
+            last = null
         }
     }
 
@@ -162,6 +195,14 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
             current = current.left!!
         }
         return current.value
+    }
+
+    private fun min(element: Node<T>): Node<T> {
+        var current: Node<T> = element
+        while (current.left != null) {
+            current = current.left!!
+        }
+        return current
     }
 
     override fun last(): T {
