@@ -17,6 +17,11 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         var right: Node<T>? = null
         var uplink: Node<T>? = null
         var parent: Node<T>? = null
+
+        fun isList(): Boolean = right == null && left == null
+        //true - left, false - right
+        fun isPreList(mode: Boolean): Boolean =
+                if (mode) !left?.isList()!! && right?.isList()!! else left?.isList()!! && !right?.isList()!!
     }
 
     override fun add(element: T): Boolean {
@@ -64,16 +69,20 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         if (!contains(element) || root == null) return false
         val del = find(element)
         remove(del)
-        return contains(element)
+        return if (!contains(element)) {
+            size--
+            true
+        } else
+            false
     }
 
     private fun remove(del: Node<T>?) {
-        if (del?.left == null && del?.right == null) {
-            if (del?.parent?.left == del)
-                del?.parent?.left = null
+        if (del!!.isList()) {
+            if (del.parent?.left == del)
+                del.parent?.left = null
             else {
-                del?.parent?.uplink = del?.uplink
-                del?.parent?.right = null
+                del.parent?.uplink = del.uplink
+                del.parent?.right = null
             }
         } else if (del.right != null) {
             if (del.parent?.left == del)
@@ -85,11 +94,15 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
             if (del.parent?.left == del)
                 del.parent?.left = del.left
             else
-                del.parent?.right = del.right
+                del.parent?.right = del.left
         } else {
-            val f = min(del.right!!)
-            del.value = f.value
-            remove(f)
+            if (del.right!!.left == null) {
+                del.right = del.right!!.right
+            } else {
+                val f = min(del.right!!)
+                del.value = f.value
+                remove(f)
+            }
         }
     }
 
@@ -155,8 +168,10 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Сложная
          */
         override fun remove() {
-            if (last != null)
+            if (last != null) {
                 remove(last)
+                size--
+            }
             last = null
         }
     }
