@@ -19,9 +19,10 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         var parent: Node<T>? = null
 
         fun isList(): Boolean = right == null && left == null
-        //true - left, false - right
-        fun isPreList(mode: Boolean): Boolean =
-                if (mode) !left?.isList()!! && right?.isList()!! else left?.isList()!! && !right?.isList()!!
+        fun full(): Boolean = left != null && right != null
+        override fun toString(): String {
+            return value.toString()
+        }
     }
 
     override fun add(element: T): Boolean {
@@ -77,39 +78,36 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
     }
 
     private fun remove(del: Node<T>?) {
-        if (del!!.isList()) {
-            if (del.parent?.left == del)
-                del.parent?.left = null
-            else {
-                del.parent?.uplink = del.uplink
-                del.parent?.right = null
-            }
-        } else if (del.right != null) {
-            if (del.parent?.left == del)
-                del.parent?.left = del.right
-            else
-                del.parent?.right = del.right
+        if (del!!.full()) {
+            val n = min(del.right!!)
+            del.value = n.value
+            remove(n)
         } else if (del.left != null) {
-            del.left?.uplink = del.parent
-            if (del.parent?.left == del)
-                del.parent?.left = del.left
+            del.left!!.uplink = del.parent
+            if (del === del.parent?.left)
+                del.parent!!.left = del.left
             else
-                del.parent?.right = del.left
-        } else {
-            if (del.right!!.left == null) {
-                del.right = del.right!!.right
+                del.parent!!.right = del.left
+        } else if (del.right != null) {
+            if (del === del.parent?.left) {
+                del.parent!!.left = del.right
             } else {
-                val f = min(del.right!!)
-                del.value = f.value
-                remove(f)
+                del.parent!!.right = del.right
+            }
+        } else {
+            if (del === del.parent?.left) {
+                del.parent!!.left = null
+            } else {
+                del.parent!!.right = null
+                del.parent!!.uplink = del.uplink
             }
         }
     }
 
     private fun findMax(node: KtBinaryTree.Node<T>?): Node<T> {
-        var res = node
-        while (res!!.right != null)
-            res = res.right
+        var res = node ?: return node!!
+        while (res.right != null)
+            res = res.right!!
         return res
     }
 

@@ -50,31 +50,40 @@ class BinaryTreeTest {
     private fun <T : Comparable<T>> createKotlinTree(): CheckableSortedSet<T> = KtBinaryTree()
 
     private fun testRemove(create: () -> CheckableSortedSet<Int>) {
-        val random = Random()
-        for (iteration in 1..100) {
-            val list = mutableListOf<Int>()
-            for (i in 1..20) {
-                list.add(random.nextInt(100))
-            }
-            val treeSet = TreeSet<Int>()
-            val binarySet = create()
-            for (element in list) {
-                treeSet += element
-                binarySet += element
-            }
-            val toRemove = list[random.nextInt(list.size)]
-            treeSet.remove(toRemove)
-            binarySet.remove(toRemove)
-            println("Removing $toRemove from $list")
-            assertEquals<SortedSet<*>>(treeSet, binarySet, "After removal of $toRemove from $list")
-            assertEquals(treeSet.size, binarySet.size)
-            for (element in list) {
-                val inn = element != toRemove
-                assertEquals(inn, element in binarySet,
-                        "$element should be ${if (inn) "in" else "not in"} tree")
-            }
-            assertTrue(binarySet.checkInvariant())
+        val list = mutableListOf<Int>(29, 71, 27, 39, 18, 89, 55, 68, 19, 86, 71, 65, 30, 55, 51, 39, 3, 92, 77, 90)
+        val treeSet = TreeSet<Int>(list)
+
+        val binarySet = KtBinaryTree<Int>()
+        binarySet.addAll(list)
+
+        val toRemove = 86
+
+        println(binarySet)
+        treeSet.remove(toRemove)
+        binarySet.remove(toRemove)
+        println(binarySet)
+
+
+        assertEquals<SortedSet<*>>(treeSet, binarySet, "After removal of $toRemove from $list")
+        assertEquals(treeSet.size, binarySet.size)
+        for (element in list) {
+            val inn = element != toRemove
+            assertEquals(inn, element in binarySet,
+                    "$element should be ${if (inn) "in" else "not in"} tree")
         }
+        assertTrue(binarySet.checkInvariant())
+    }
+
+    @Test
+    @Tag("Normal")
+    fun tstTree() {
+        val treeSet = TreeSet<Int>()
+        val binarySet = createKotlinTree<Int>()
+        //treeSet.addAll(listOf(5, 3, 8, 6))
+        treeSet.addAll(listOf(29, 71, 27, 39, 18, 89, 55, 68, 19, 86, 71, 65, 30, 55, 51, 39, 3, 92, 77, 90))
+        treeSet.remove(86)
+        binarySet.addAll(listOf(29, 71, 27, 39, 18, 89, 55, 68, 19, 71, 65, 30, 55, 51, 39, 3, 92, 77, 90))
+        assertTrue(binarySet.equals(treeSet))
     }
 
     @Test
