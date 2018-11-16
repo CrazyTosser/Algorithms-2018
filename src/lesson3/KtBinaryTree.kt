@@ -18,7 +18,6 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         var uplink: Node<T>? = null
         var parent: Node<T>? = null
 
-        fun isList(): Boolean = right == null && left == null
         fun full(): Boolean = left != null && right != null
         override fun toString(): String {
             return value.toString()
@@ -83,7 +82,10 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
             del.value = n.value
             remove(n)
         } else if (del.left != null) {
-            del.left!!.uplink = del.parent
+            if (del.left!!.right == null)
+                del.left!!.uplink = del.parent
+            else
+                del.left!!.uplink = null
             if (del === del.parent?.left)
                 del.parent!!.left = del.left
             else
@@ -225,4 +227,11 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         }
         return current.value
     }
+
+//    override fun toString(): String {
+//        val res = StringBuilder().append("[")
+//        for (i in this)
+//            res.append(i).append(", ")
+//        return res.append("]").toString()
+//    }
 }
