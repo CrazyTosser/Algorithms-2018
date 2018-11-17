@@ -60,13 +60,11 @@ class BinaryTreeTest {
             val binarySet = create()
             binarySet.addAll(list)
             val toRemove = list[random.nextInt(list.size)]
-            println(list)
-            println(toRemove)
             treeSet.remove(toRemove)
             binarySet.remove(toRemove)
             println("Removing $toRemove from $list")
-            assertEquals(treeSet.size, binarySet.size)
             assertEquals<SortedSet<*>>(treeSet, binarySet, "After removal of $toRemove from $list")
+            assertEquals(treeSet.size, binarySet.size)
             for (element in list) {
                 val inn = element != toRemove
                 assertEquals(inn, element in binarySet,
@@ -81,10 +79,12 @@ class BinaryTreeTest {
     fun tstTree() {
         val treeSet = TreeSet<Int>()
         val binarySet = createKotlinTree<Int>()
-        treeSet.addAll(listOf(71, 15, 2, 92, 91, 88, 73))
-        treeSet.remove(91)
-        binarySet.addAll(listOf(71, 15, 2, 92, 91, 88, 73))
-        binarySet.remove(91)
+        treeSet.addAll(listOf(95, 92, 33, 6, 29, 91, 24))
+        treeSet.remove(95)
+        binarySet.addAll(listOf(95, 92, 33, 6, 29, 91, 24))
+        binarySet.remove(95)
+        println(binarySet)
+        assertEquals<SortedSet<*>>(treeSet, binarySet)
         assertTrue(binarySet.equals(treeSet))
     }
 
