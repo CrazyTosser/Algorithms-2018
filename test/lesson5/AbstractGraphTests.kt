@@ -18,7 +18,7 @@ abstract class AbstractGraphTests {
             assertTrue(isEmpty(), "Euler loop should not exist")
         }
         for (edge in this) {
-            assertTrue(edge in edges, "Edge $edge is not inside graph")
+            assertEquals(edges.count { it === edge }, 1, "Edge $edge is not inside graph")
         }
         for (i in 0 until size - 1) {
             assertTrue(this[i].isNeighbour(this[i + 1]), "Edges ${this[i]} & ${this[i + 1]} are not incident")

@@ -102,7 +102,7 @@ class BinaryTreeTest {
     fun myRemove() {
         val list = mutableListOf(5, 3, 1, 4, 8, 10, 7)
         val treeSet = TreeSet<Int>(list)
-        val binarySet = KtBinaryTree<Int>()
+        val binarySet = BinaryTree<Int>()
         binarySet.addAll(list)
         assertEquals(1, binarySet.first())
         assertEquals(10, binarySet.last())

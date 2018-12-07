@@ -11,6 +11,12 @@ public interface Graph {
     interface Vertex {
         @NotNull
         String getName();
+
+        int getV();
+
+        int incrV();
+
+        int decrV();
     }
 
     interface Edge {

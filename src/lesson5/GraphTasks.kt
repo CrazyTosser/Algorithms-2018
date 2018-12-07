@@ -2,6 +2,9 @@
 
 package lesson5
 
+import lesson5.impl.GraphBuilder
+import java.util.*
+
 /**
  * Эйлеров цикл.
  * Средняя
@@ -29,7 +32,29 @@ package lesson5
  * связного графа ровно по одному разу
  */
 fun Graph.findEulerLoop(): List<Graph.Edge> {
-    TODO()
+    this.vertices.forEach { if (it.v % 2 != 0) return emptyList() }
+    val st = Stack<Graph.Vertex>()
+    st.push(this.vertices.first())
+    val edge = edges.toMutableSet()
+    val res = mutableListOf<Graph.Edge>()
+    while (!st.empty()) {
+        if (st.peek().v == 0) {
+            if (st.size == 1)
+                if (res[0].begin != st.peek()) return emptyList()
+                else break
+            res += GraphBuilder.EdgeImpl(1, st.pop(), st.peek())
+        } else {
+            val e = edge.first { it.begin == st.peek() || it.end == st.peek() }
+            st.peek().decrV()
+            when (st.peek()) {
+                e.begin -> st.push(e.end)
+                e.end -> st.push(e.begin)
+            }
+            st.peek().decrV()
+            edge.removeIf { it.begin == e.begin && it.end == e.end }
+        }
+    }
+    return res
 }
 
 /**
@@ -61,7 +86,36 @@ fun Graph.findEulerLoop(): List<Graph.Edge> {
  * J ------------ K
  */
 fun Graph.minimumSpanningTree(): Graph {
-    TODO()
+    val res = GraphBuilder()
+    //    val queue = PriorityQueue<Graph.Vertex>(compareBy { v ->
+//        this.edges.filter { it.begin == v || it.end == v }
+//                .filter { e ->
+//                    res.build().vertices.any { e.begin == it || e.end == it }
+//                }.minBy { it.weight }?.weight ?: -1
+//    })
+    val max = this.vertices.maxBy { it.v }?.v ?: return res.build()
+    val vert = this.vertices.filter { it.v == max }
+    val st = Stack<Graph.Vertex>()
+    res.addVertex(vert.first().name)
+    vert.forEach { v ->
+        for ((end, edge) in this.getConnections(v)) {
+            if (res.getVertex(end) == null) {
+                st.push(end)
+                res.addVertex(end.name)
+                res.addConnection(res.getVertex(edge.begin)!!, res.getVertex(edge.end)!!)
+            }
+        }
+    }
+    while (!st.empty()) {
+        for ((end, edge) in this.getConnections(st.pop())) {
+            if (res.getVertex(end) == null) {
+                st.push(end)
+                res.addVertex(end.name)
+                res.addConnection(res.getVertex(edge.begin)!!, res.getVertex(edge.end)!!)
+            }
+        }
+    }
+    return res.build()
 }
 
 /**
