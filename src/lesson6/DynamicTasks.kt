@@ -38,7 +38,7 @@ fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
     if (list.isEmpty())
         return emptyList()
 
-    val queues = HashSet<Deque<Int>>()
+    val queues = mutableListOf<Deque<Int>>()
 
     list.forEach { num ->
         val filtered = queues.filter { it.last < num }.onEach { it.addLast(num) }
@@ -56,7 +56,7 @@ fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
                 head.add(it)
         }
 
-        res.addAll(head.reversed())
+        head.reversed().forEach { res.addFirst(it) }
     }
 
     return res.toList()
